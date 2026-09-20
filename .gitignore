@@ -1,0 +1,19 @@
+# Maven / Java
+backend/**/target/
+backend/logs/
+
+# Node / Angular
+frontend/node_modules/
+frontend/dist/
+frontend/.angular
+
+# Bases de datos locales (H2)
+data/
+
+# Logs
+*.log
+
+# IDE
+.idea/
+*.iml
+.vscode/

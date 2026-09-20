@@ -1,0 +1,26 @@
+# Configuracion del API Gateway
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: alumnos
+              uri: lb://alumnos
+              predicates:
+                - Path=/api/alumnos/**
+            - id: administracion
+              uri: lb://administracion
+              predicates:
+                - Path=/api/administracion/**
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowed-origins: "*"
+                allowed-methods: "*"
+                allowed-headers: "*"
