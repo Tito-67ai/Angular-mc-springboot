@@ -2,6 +2,22 @@
 server:
   port: 8080
 
+app:
+  jwt:
+    # Secreto usado para firmar los tokens JWT (minimo 32 caracteres).
+    secret: clave-super-secreta-para-jwt-del-proyecto-microservicios-2026
+    # Duracion del token en milisegundos (1 hora).
+    expiration: 3600000
+  security:
+    users:
+      admin:
+        # {noop} = sin encriptar (demo). En produccion usar {bcrypt}.
+        password: "{noop}admin123"
+        roles: [ ADMIN ]
+      user:
+        password: "{noop}user123"
+        roles: [ USER ]
+
 spring:
   application:
     name: gateway

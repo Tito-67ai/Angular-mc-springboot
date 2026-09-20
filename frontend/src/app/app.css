@@ -40,6 +40,27 @@ nav a.activo {
   font-weight: 600;
 }
 
+nav .usuario {
+  align-self: center;
+  font-size: 0.85rem;
+  opacity: 0.9;
+  margin-left: 0.5rem;
+}
+
+.salir {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  color: #fff;
+  padding: 0.45rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.salir:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
 main {
   padding: 2rem;
   max-width: 1200px;

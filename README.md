@@ -35,6 +35,7 @@ Browser (Angular) ->|  API Gateway  (puerta de enlace)  :8080      |
 | API Gateway         | `backend/gateway`       | 8080   | Puerta de enlace con rutas `/api/alumnos/**` y `/api/administracion/**`, CORS y balanceo `lb://` |
 | microservicio alumnos | `backend/alumnos`     | 8101   | CRUD de alumnos (tabla `ALUMNOS` en H2). Publica eventos `alumno.creado` |
 | microservicio administracion | `backend/administracion` | 8102 | CRUD de docentes (tabla `DOCENTES` en H2). Publica eventos `docente.creado` |
+| Spring Boot Admin   | `backend/admin-server`  | 9090   | Panel de monitoreo: estado, salud, métricas y logs de todos los microservicios (descubiertos vía Eureka) |
 | RabbitMQ            | `docker-compose.yml`    | 5672 / 15672 | Broker de mensajería. Los microservicios publican y consumen eventos entre sí |
 
 ### Mensajería (RabbitMQ)
@@ -92,17 +93,40 @@ npm start        # http://localhost:4200
 
 El frontend consume siempre el **API Gateway** (`http://localhost:8080`), nunca los microservicios directamente.
 
+## Autenticación (JWT)
+
+El **API Gateway** protege todas las rutas `/api/**` con Spring Security + tokens JWT. Para consumir la API primero hay que obtener un token en `POST /auth/login` y luego enviarlo en el header `Authorization: Bearer <token>`.
+
+Usuarios de demo (definidos en `backend/config-server/src/main/resources/config/gateway.yml`):
+
+| Usuario | Contraseña | Rol |
+|---|---|---|
+| `admin` | `admin123` | ADMIN |
+| `user` | `user123` | USER |
+
+```powershell
+# 1) Obtener token
+$token = (curl -s -X POST http://localhost:8080/auth/login -H "Content-Type: application/json" `-d '{"username":"admin","password":"admin123"}') | ConvertFrom-Json | Select -Expand token
+
+# 2) Usar el token en las llamadas
+curl -H "Authorization: Bearer $token" http://localhost:8080/api/alumnos
+```
+
+Sin token (o con token inválido) la API responde `401 Unauthorized`. El frontend Angular maneja el login desde `http://localhost:61666` (vista "Iniciar sesión") y envía el token automáticamente vía interceptor.
+
 ## Prueba rápida
+
+> Requiere el paso previo de **Autenticación** (obtener el `$token` con el comando anterior).
 
 ```powershell
 # Listar alumnos a través del gateway
-curl http://localhost:8080/api/alumnos
+curl -H "Authorization: Bearer $token" http://localhost:8080/api/alumnos
 
 # Crear un alumno (dispara el evento alumno.creado en RabbitMQ)
-curl -X POST http://localhost:8080/api/alumnos -H "Content-Type: application/json" `-d '{"nombre":"Lucia","apellido":"Fernandez","curso":"Quimica"}'
+curl -X POST http://localhost:8080/api/alumnos -H "Content-Type: application/json" -H "Authorization: Bearer $token" `-d '{"nombre":"Lucia","apellido":"Fernandez","curso":"Quimica"}'
 
 # Crear un docente (dispara el evento docente.creado en RabbitMQ)
-curl -X POST http://localhost:8080/api/administracion -H "Content-Type: application/json" `-d '{"nombre":"Juan","apellido":"Paredes","especialidad":"Historia"}'
+curl -X POST http://localhost:8080/api/administracion -H "Content-Type: application/json" -H "Authorization: Bearer $token" `-d '{"nombre":"Juan","apellido":"Paredes","especialidad":"Historia"}'
 ```
 
 Luego revisar la consola de `administracion` (recibió `alumno.creado`) y de `alumnos` (recibió `docente.creado`).
@@ -126,4 +150,5 @@ Cada servicio la consume al arrancar vía `spring.config.import: optional:config
 | Config Server | http://localhost:8888 |
 | Alumnos (directo) | http://localhost:8101/api/alumnos |
 | Administración (directo) | http://localhost:8102/api/administracion |
+| **Spring Boot Admin** | http://localhost:9090 |
 | RabbitMQ (UI) | http://localhost:15672 |

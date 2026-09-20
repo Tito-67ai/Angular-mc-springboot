@@ -12,7 +12,8 @@ $servicios = @(
     @{ nombre = 'config-server';   jar = 'config-server-0.0.1-SNAPSHOT.jar' },
     @{ nombre = 'alumnos';         jar = 'alumnos-0.0.1-SNAPSHOT.jar' },
     @{ nombre = 'administracion';  jar = 'administracion-0.0.1-SNAPSHOT.jar' },
-    @{ nombre = 'gateway';         jar = 'gateway-0.0.1-SNAPSHOT.jar' }
+    @{ nombre = 'gateway';         jar = 'gateway-0.0.1-SNAPSHOT.jar' },
+    @{ nombre = 'admin-server';    jar = 'admin-server-0.0.1-SNAPSHOT.jar' }
 )
 
 $logDir = Join-Path $root 'backend\logs'
@@ -38,6 +39,7 @@ Write-Host "URLs:"
 Write-Host "  Eureka (Registry):  http://localhost:8761"
 Write-Host "  Config Server:      http://localhost:8888" 
 Write-Host "  API Gateway:        http://localhost:8080"
-Write-Host "  RabbitMQ UI:        http://localhost:15672  (guest/guest)"
 Write-Host "  Alumnos directo:    http://localhost:8101/api/alumnos"
+Write-Host "  RabbitMQ UI:        http://localhost:15672  (guest/guest)"
+Write-Host "  Spring Boot Admin:  http://localhost:9090"
 Write-Host "Logs en: backend\logs"
